@@ -21,6 +21,10 @@ token = os.getenv("token")
 
 updater = Updater(token=token)
 
+lst = []
+g_dislike = 0
+d_like = 0
+
 
 def start(update: Update, context: CallbackContext):
 
@@ -28,8 +32,10 @@ def start(update: Update, context: CallbackContext):
 
     bot = context.bot
 
-    keyboard1 = InlineKeyboardButton("dislike 👎 0", callback_data="1dislike,0,0")
-    keyboard2 = InlineKeyboardButton("like 👍 0", callback_data="1like,0,0")
+    keyboard1 = InlineKeyboardButton(
+        f"dislike 👎 {g_dislike}", callback_data=f"1dislike"
+    )
+    keyboard2 = InlineKeyboardButton(f"like 👍 {d_like}", callback_data=f"1like")
     reply_markup = InlineKeyboardMarkup(
         [
             [keyboard1, keyboard2],
@@ -45,29 +51,33 @@ def start(update: Update, context: CallbackContext):
 
 def query(update: Update, context: CallbackContext):
     if update.callback_query:
+        global g_dislike
+        global d_like
+        chat_id = update.callback_query.message.chat_id
+
         button = update.callback_query.data
-        print(button)
-        count_dislike = int(button.split(",")[-2])
-        count_like = int(button.split(",")[-1])
-        bot = context.bot
-        if "dislike" in button:
-            count_dislike += 1
-        else:
-            count_like += 1
-        keyboard1 = InlineKeyboardButton(
-            f"dislike 👎 {count_dislike}",
-            callback_data=f"1dislike,{count_dislike},{count_like}",
-        )
-        keyboard2 = InlineKeyboardButton(
-            f"like 👍 {count_like}", callback_data=f"1like,{count_dislike},{count_like}"
-        )
-        reply_markup = InlineKeyboardMarkup(
-            [
-                [keyboard1, keyboard2],
-            ]
-        )
+
         # Example: answer the callback query to avoid Telegram client loading icon
-        update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+        if chat_id not in lst:
+            if "dislike" in button:
+                g_dislike += 1
+            else:
+                d_like += 1
+
+            keyboard1 = InlineKeyboardButton(
+                f"dislike 👎 {g_dislike}",
+                callback_data="1dislike",
+            )
+            keyboard2 = InlineKeyboardButton(
+                f"like 👍 {d_like}", callback_data=f"1like"
+            )
+            reply_markup = InlineKeyboardMarkup(
+                [
+                    [keyboard1, keyboard2],
+                ]
+            )
+            update.callback_query.edit_message_reply_markup(reply_markup=reply_markup)
+        lst.append(chat_id)
 
 
 dispatcher = updater.dispatcher
