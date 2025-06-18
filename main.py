@@ -42,11 +42,10 @@ def start(update: Update, context: CallbackContext):
 def query(update: Update, context: CallbackContext):
     if update.callback_query:
         button = update.callback_query.data
-        parts = button.split(",")
-        action = parts[0]
-        count_dislike = int(parts[1])
-        count_like = int(parts[2])
-
+        print(button)
+        count_dislike = int(button.split(",")[1])
+        count_like = int(button.split(",")[2])
+        bot = context.bot
         if "dislike" in button:
             count_dislike += 1
         else:
