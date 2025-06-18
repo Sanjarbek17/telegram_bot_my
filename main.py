@@ -13,7 +13,11 @@ from telegram import (
     InlineKeyboardButton,
 )
 
-token = "8016350842:AAEvU0fcRkhyo9qzKCBCZwIwIBWE3KUKeW4"
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+token = os.getenv("token")
 
 updater = Updater(token=token)
 
